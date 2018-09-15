@@ -5,6 +5,7 @@
 #include <chrono>
 
 #include <getopt.h>
+#include <helpers.h>
 
 constexpr auto generateCharset()
 {
@@ -18,13 +19,6 @@ constexpr auto generateCharset()
 	for (char c = 'A'; c <= 'Z'; ++c, ++idx)
 		chars[idx] = c;
 	return chars;
-}
-
-inline size_t parseSize(const char* str)
-{
-	char* end;
-	auto num = strtoull(str, &end, 10);
-	return num;
 }
 
 void usage()
