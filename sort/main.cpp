@@ -6,6 +6,7 @@
 #include <algorithm>
 
 #include <getopt.h>
+#include <csignal>
 #include <helpers.h>
 
 void usage()
@@ -77,14 +78,31 @@ bool merge(const std::string& sortedFileName, const std::string& tmpPrefix, size
 	return true;
 }
 
+namespace
+{
+	std::string sortedFileName, tmpPrefix;
+	size_t maxTmpFiles = 30;
+}
+
+void sigintHandler(int)
+{
+	remove(sortedFileName.c_str());
+	remove(tmpPrefix.c_str());
+	for (size_t i = 0; i < maxTmpFiles; ++i)
+		remove((tmpPrefix + '.' + std::to_string(i)).c_str());
+	exit(1);
+}
+
 int main(int argc, char* argv[])
 {
 	std::ios_base::sync_with_stdio(false);
 	std::cin.tie(nullptr);
 
+	signal(SIGINT, sigintHandler);
+
 	std::string inputFile, outputFile;
 	std::string workingDirectory = "/var/tmp";
-	size_t batchSize = 1000, maxTmpFiles = 30;
+	size_t batchSize = 1000;
 
 	int c;
 	while ((c = getopt(argc, argv, "i:o:d:b:f:")) != -1)
@@ -131,8 +149,8 @@ int main(int argc, char* argv[])
 		return std::cin;
 	}();
 
-	auto sortedFileName = workingDirectory + "/sorted";
-	auto tmpPrefix = workingDirectory + "/sorted.tmp";
+	sortedFileName = workingDirectory + "/sorted";
+	tmpPrefix = workingDirectory + "/sorted.tmp";
 	remove(sortedFileName.c_str());
 
 	size_t numberOfFile = 0;
@@ -170,7 +188,7 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	if (!merge(sortedFileName, tmpPrefix, numberOfFile))
+	if (numberOfFile != 0 && !merge(sortedFileName, tmpPrefix, numberOfFile))
 		return 1;
 
 	if (rename(sortedFileName.c_str(), outputFile.c_str()) != 0)
