@@ -61,7 +61,7 @@ bool merge(const std::string& sortedFileName, const std::string& tmpPrefix, size
 	while (!files.empty())
 	{
 		auto it = std::min_element(files.begin(), files.end(),
-									   [](const InputFile& a, const InputFile& b) { return a.line < b.line; });
+								   [](const InputFile& a, const InputFile& b) { return a.line < b.line; });
 		auto& file = *it;
 		outputFile << file.line << '\n';
 		if (!std::getline(file.fs, file.line))
@@ -79,6 +79,9 @@ bool merge(const std::string& sortedFileName, const std::string& tmpPrefix, size
 
 int main(int argc, char* argv[])
 {
+	std::ios_base::sync_with_stdio(false);
+	std::cin.tie(nullptr);
+
 	std::string inputFile, outputFile;
 	std::string workingDirectory = "/var/tmp";
 	size_t batchSize = 1000, maxTmpFiles = 30;
