@@ -139,15 +139,24 @@ int main(int argc, char* argv[])
 	batch.reserve(batchSize);
 
 	std::ifstream fs;
+	bool opened = true;
 	std::istream& input = [&] () -> std::istream& {
 		if (!inputFile.empty())
 		{
 			fs.open(inputFile);
+			if (!fs)
+				opened = false;
 			return fs;
 		}
 
 		return std::cin;
 	}();
+
+	if (!opened)
+	{
+		std::cerr << "aborting: can't open input file " << inputFile << std::endl;
+		return 1;
+	}
 
 	sortedFileName = workingDirectory + "/sorted";
 	tmpPrefix = workingDirectory + "/sorted.tmp";
