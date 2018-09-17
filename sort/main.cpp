@@ -7,6 +7,7 @@
 
 #include <getopt.h>
 #include <csignal>
+#include <unistd.h>
 #include <helpers.h>
 
 void usage()
@@ -158,8 +159,9 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	sortedFileName = workingDirectory + "/sorted";
-	tmpPrefix = workingDirectory + "/sorted.tmp";
+	auto pid = std::to_string(getpid());
+	sortedFileName = workingDirectory + '/' + pid + "_sorted";
+	tmpPrefix = workingDirectory + '/' + pid + "_sorted.tmp";
 	remove(sortedFileName.c_str());
 
 	size_t numberOfFile = 0;
